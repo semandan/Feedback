@@ -1,0 +1,385 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.fb-wrap { font-family: var(--font-sans, sans-serif); color: var(--text-primary); width: 100%; min-height: 520px; }
+.fb-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; min-height: 24px; }
+.fb-back { font-size: 13px; color: var(--text-muted); cursor: pointer; text-decoration: none; transition: color 0.15s; user-select: none; padding: 2px 0; }
+.fb-back:hover { color: var(--text-primary); }
+.fb-back.hidden { visibility: hidden; pointer-events: none; }
+.fb-progress-bar { flex: 1; height: 4px; background: var(--border); border-radius: 99px; margin: 0 12px; }
+.fb-progress-fill { height: 100%; background: #99CC33; border-radius: 99px; transition: width 0.4s ease; }
+.fb-step-label { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.fb-screen { display: none; flex-direction: column; align-items: center; padding: 16px 16px 32px; animation: fbFadeIn 0.35s ease; }
+.fb-screen.active { display: flex; }
+@keyframes fbFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.fb-gif { width: 200px; height: 140px; border-radius: 14px; overflow: hidden; margin-bottom: 24px; background: var(--surface-1); border: 0.5px solid var(--border); flex-shrink: 0; }
+.fb-gif img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fb-qlabel { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #99CC33; margin-bottom: 8px; text-align: center; }
+.fb-h2 { font-size: 20px; font-weight: 500; text-align: center; line-height: 1.4; margin-bottom: 8px; color: var(--text-primary); }
+.fb-sub { font-size: 14px; color: var(--text-muted); text-align: center; margin-bottom: 28px; line-height: 1.6; }
+.nps-row { display: flex; gap: 5px; flex-wrap: nowrap; justify-content: center; margin-bottom: 10px; max-width: 500px; width: 100%; }
+.nps-btn { width: 44px; height: 44px; border-radius: 10px; border: 1.5px solid var(--border-strong); background: var(--surface-1); color: var(--text-primary); font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.15s; font-family: inherit; flex-shrink: 0; }
+.nps-btn:hover { border-color: #99CC33; background: var(--surface-2); }
+.nps-btn.sel { background: #99CC33; border-color: #99CC33; color: #fff; transform: scale(1.1); }
+.nps-ends { display: flex; justify-content: space-between; width: 100%; max-width: 480px; font-size: 12px; color: var(--text-muted); margin-bottom: 28px; padding: 0 2px; }
+.exp-wrap { width: 100%; max-width: 460px; margin-bottom: 8px; }
+.exp-track { height: 20px; border-radius: 10px; background: var(--surface-1); border: 1.5px solid var(--border-strong); position: relative; overflow: hidden; margin-bottom: 6px; }
+.exp-fill { height: 100%; border-radius: 10px; transition: width 0.15s, background 0.3s; min-width: 4px; }
+.exp-marker { position: absolute; top: 0; bottom: 0; left: 66.67%; width: 2px; background: rgba(128,128,128,0.4); }
+.exp-val { font-size: 42px; font-weight: 500; text-align: center; margin: 12px 0 4px; transition: color 0.3s; color: var(--text-primary); }
+.exp-emoji { text-align: center; font-size: 26px; margin-bottom: 28px; min-height: 36px; }
+@keyframes sparkle { 0%{transform:scale(1);}50%{transform:scale(1.3);}100%{transform:scale(1);} }
+.spark { display: inline-block; animation: sparkle 0.7s infinite; }
+.spark2 { animation-delay: 0.2s; }
+.spark3 { animation-delay: 0.4s; }
+.words-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 500px; margin-bottom: 10px; }
+.word-chip { padding: 8px 16px; border-radius: 99px; border: 1.5px solid var(--border-strong); background: var(--surface-1); color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; user-select: none; }
+.word-chip:hover { border-color: #99CC33; color: var(--text-primary); }
+.word-chip.sel { background: #99CC33; border-color: #99CC33; color: #fff; }
+.word-chip.dimmed { opacity: 0.35; pointer-events: none; }
+.word-count { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; text-align: center; }
+.word-add-row { display: flex; gap: 8px; max-width: 460px; width: 100%; margin-bottom: 20px; }
+.word-add-input { flex: 1; padding: 9px 14px; border-radius: 99px; border: 1.5px solid var(--border-strong); background: var(--surface-2); color: var(--text-primary); font-size: 13px; font-family: inherit; outline: none; transition: border-color 0.15s; }
+.word-add-input:focus { border-color: #99CC33; }
+.word-add-input::placeholder { color: var(--text-muted); }
+.word-add-btn { padding: 9px 18px; border-radius: 99px; border: 1.5px solid #99CC33; background: transparent; color: #99CC33; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+.word-add-btn:hover { background: #99CC33; color: #fff; }
+.fb-textarea { width: 100%; max-width: 460px; min-height: 110px; border-radius: 12px; border: 1.5px solid var(--border-strong); background: var(--surface-2); color: var(--text-primary); font-size: 14px; padding: 14px 16px; resize: vertical; outline: none; font-family: inherit; line-height: 1.6; margin-bottom: 12px; transition: border-color 0.15s; }
+.fb-textarea:focus { border-color: #99CC33; }
+.fb-textarea::placeholder { color: var(--text-muted); }
+.skip-lnk { font-size: 12px; color: var(--text-muted); cursor: pointer; text-decoration: underline; margin-bottom: 16px; display: block; text-align: center; transition: color 0.15s; }
+.skip-lnk:hover { color: var(--text-secondary); }
+.fb-btn { padding: 12px 36px; border-radius: 99px; background: #99CC33; color: #fff; border: none; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+.fb-btn:hover { background: #88bb22; }
+.fb-btn:active { transform: scale(0.97); }
+.fb-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+.cipher-box { background: var(--surface-1); border: 1.5px solid #99CC33; border-radius: 12px; padding: 16px 20px; font-family: monospace; font-size: 11px; color: #99CC33; word-break: break-all; max-width: 460px; width: 100%; margin: 16px 0; line-height: 1.8; text-align: left; }
+.intro-title { font-size: 28px; font-weight: 500; text-align: center; margin-bottom: 10px; color: var(--text-primary); }
+.time-badge { display: inline-block; background: var(--surface-1); color: #99CC33; border: 1.5px solid #99CC33; border-radius: 99px; padding: 5px 14px; font-size: 12px; font-weight: 500; margin-bottom: 32px; }
+.praise-title { font-size: 24px; font-weight: 500; text-align: center; margin-bottom: 10px; color: var(--text-primary); }
+input[type=range] { accent-color: #99CC33; }
+</style>
+
+<div class="fb-wrap">
+  <div class="fb-topbar">
+    <span class="fb-back hidden" id="back-btn" onclick="goBack()">← zpět</span>
+    <div class="fb-progress-bar"><div class="fb-progress-fill" id="pbar" style="width:0%"></div></div>
+    <div class="fb-step-label" id="slabel"></div>
+  </div>
+  <div id="app"></div>
+</div>
+
+<script>
+const answers = {};
+let step = 0;
+const STEPS = ['intro','q1','q3','q4','praise','q5','q6','q7','q8','q9','done'];
+const Q_STEPS = ['q1','q3','q4','q5','q6','q7','q8','q9'];
+const TOTAL = Q_STEPS.length;
+
+const GIFS = {
+  intro: 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTNmZ3d4d3JhYTQ3M2NhOTBuZzQwcmd5cHNldzZiMTh6eDlhN2MxaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/remMvcYDTQNKE/giphy.gif',
+  q1: 'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmY2dHE5MjVoeGtqdGpoMHlpc2dxeDl2dmcwM2xpeXo3eTN4enhoeiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/e9naycep2pz7OHQ4n0/giphy.gif',
+  q3: 'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTRteWtva3NkemZraWQ0MzI1Mm82dWtiYWs1a2lzc3k2aHRoYW1mNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/j5QjnvhyKI8LM0tXK3/giphy.gif',
+  q4: 'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnRhYzQ2NW13ajJvZGc1N2Vva2h6NzRrNWxucno4dmQxNGFrMXU1ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xTiTnHvXHHxOTcdmxO/giphy.gif',
+  praise: 'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZjJjaGM1dDRuem1ycWo3cGo2dHl2dzZ2N2F6NXE3anN3Z3Y2endpNiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l49JHLpRSLhecYEmI/giphy.gif',
+  q5: 'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmEyaXdtejh4MDZxejRhb3ZiNzZzNnh0OTd0b2tseDd5dGVkMmIwcSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8b9Xax6L7qtAkAimGm/giphy.gif',
+  q6: 'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExam0yMGo3aHlpZ21teHFxN3d4am5uYm40d2dudjJnbjBxdG55aDRkOSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9wv8qIAq9njgY/giphy.gif',
+  q7: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnE3ZHM1eHE2ZnZyMmNlcnZ4cWF2M3BnM3ZzaGNvc3Rub3J6c202ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/1zSz5MVw4zKg0/giphy.gif',
+  q8: 'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmxud2Jvc3pieGI3N2NyMzBlejdjdnI1bzMzMGo1NGIyMDNkZHd4ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/S3Ot3hZ5bcy8o/giphy.gif',
+  q9: 'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjhwMHR4djAwamJxN3g1dnVoZnhhYTRrZXVodDk3NnNjamN5b3UydCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT0xeJpnrWC4XWblEk/giphy.gif',
+  done: 'https://media.giphy.com/media/26u4lOMA8JKSnL9Uk/giphy.gif'
+};
+
+const BASE_WORDS = [
+  'Spolehlivý','Kreativní','Přímý','Empatický','Proaktivní','Analytický',
+  'Energický','Adaptabilní','Strategický','Detailista','Motivující','Tahoun',
+  'Tichý, ale efektivní','Chaosák','Pomalší start, silný výsledek','Zvědavý','Magor','Flákač'
+];
+let customWords = [];
+
+function next() { step++; render(); }
+function goBack() { if (step > 0) { step--; render(); } }
+
+function updateBar() {
+  const s = STEPS[step];
+  const backBtn = document.getElementById('back-btn');
+  if (backBtn) {
+    backBtn.classList.toggle('hidden', step === 0 || s === 'done');
+  }
+  const qi = Q_STEPS.indexOf(s);
+  if (qi >= 0) {
+    document.getElementById('pbar').style.width = Math.round((qi / TOTAL) * 100) + '%';
+    document.getElementById('slabel').textContent = (qi + 1) + ' / ' + TOTAL;
+  } else if (s === 'done') {
+    document.getElementById('pbar').style.width = '100%';
+    document.getElementById('slabel').textContent = '';
+  } else if (s === 'praise') {
+    document.getElementById('pbar').style.width = Math.round((4 / TOTAL) * 100) + '%';
+    document.getElementById('slabel').textContent = '';
+  } else {
+    document.getElementById('pbar').style.width = '0%';
+    document.getElementById('slabel').textContent = '';
+  }
+}
+
+function gif(key) {
+  return '<div class="fb-gif"><img src="' + GIFS[key] + '" alt="" /></div>';
+}
+
+function expColor(v) {
+  if (v < 50) return '#ef4444';
+  if (v < 80) return '#f97316';
+  if (v < 100) return '#eab308';
+  if (v === 100) return '#22c55e';
+  return '#99CC33';
+}
+
+function render() {
+  updateBar();
+  const s = STEPS[step];
+  const app = document.getElementById('app');
+
+  if (s === 'intro') {
+    app.innerHTML = '<div class="fb-screen active">' +
+      gif('intro') +
+      '<div class="intro-title">Nazdárek! 👋</div>' +
+      '<p class="fb-sub">Feedback je žrádlo. Nakrm Dana!</p>' +
+      '<div class="time-badge">Zabere to asi 3–5 minut.</div>' +
+      '<button class="fb-btn" onclick="next()">Let\'s do this!</button>' +
+      '</div>';
+  }
+
+  else if (s === 'q1') {
+    var btns = [0,1,2,3,4,5,6,7,8,9,10].map(function(n) {
+      return '<button class="nps-btn' + (answers.q1 === n ? ' sel' : '') + '" onclick="pickNPS(' + n + ')">' + n + '</button>';
+    }).join('');
+    app.innerHTML = '<div class="fb-screen active">' +
+      gif('q1') +
+      '<div class="fb-qlabel">Dan-NPS</div>' +
+      '<h2 class="fb-h2">Jak moc bys Dana doporučil jako kolegu?</h2>' +
+      '<p class="fb-sub">NPS škála — 0 = vůbec ne, 10 = okamžitě a s radostí</p>' +
+      '<div class="nps-row">' + btns + '</div>' +
+      '<div class="nps-ends"><span>😬 TVL nikdy!!!</span><span>DESET!!! 🚀</span></div>' +
+      '<button class="fb-btn" id="bn1" ' + (answers.q1 === undefined ? 'disabled' : '') + ' onclick="next()">Další</button>' +
+      '</div>';
+  }
+
+  else if (s === 'q3') {
+    var v = answers.q3 !== undefined ? answers.q3 : 100;
+    var col = expColor(v);
+    app.innerHTML = '<div class="fb-screen active">' +
+      gif('q3') +
+      '<div class="fb-qlabel">Expectations vs. Reality</div>' +
+      '<h2 class="fb-h2">Nakolik Dan zatím naplňuje tvá očekávání?</h2>' +
+      '<p class="fb-sub">0 % = vůbec, 100 % = přesně jak jsem čekal, 150 % = wow</p>' +
+      '<div class="exp-wrap">' +
+        '<div style="text-align:center;font-size:11px;color:var(--text-muted);margin-bottom:4px;">↑ 100 % = baseline</div>' +
+        '<div class="exp-track"><div class="exp-fill" id="efill" style="width:' + Math.round(v/1.5) + '%;background:' + col + '"></div><div class="exp-marker"></div></div>' +
+        '<input type="range" min="0" max="150" step="1" value="' + v + '" oninput="updExp(+this.value)" style="width:100%;margin-top:8px;">' +
+      '</div>' +
+      '<div class="exp-val" id="eval" style="color:' + col + '">' + v + ' %</div>' +
+      '<div class="exp-emoji" id="eemoji"></div>' +
+      '<button class="fb-btn" onclick="answers.q3=+document.querySelector(\'input[type=range]\').value; next()">Další</button>' +
+      '</div>';
+    updExp(v);
+  }
+
+  else if (s === 'q4') {
+    var allWords = BASE_WORDS.concat(customWords);
+    var cnt = answers.q4 ? answers.q4.length : 0;
+    var chips = allWords.map(function(w) {
+      var sel = answers.q4 && answers.q4.includes(w) ? ' sel' : '';
+      var dim = cnt >= 7 && !(answers.q4 && answers.q4.includes(w)) ? ' dimmed' : '';
+      return '<div class="word-chip' + sel + dim + '" onclick="toggleWord(\'' + w.replace(/'/g,"\\'") + '\', this)">' + w + '</div>';
+    }).join('');
+    app.innerHTML = '<div class="fb-screen active">' +
+      gif('q4') +
+      '<div class="fb-qlabel">Jak ho vidíš...</div>' +
+      '<h2 class="fb-h2">Vyber 5–7 slov, která popisují Dana v práci</h2>' +
+      '<div class="words-grid" id="wgrid">' + chips + '</div>' +
+      '<div class="word-count" id="wcnt">' + cnt + ' / 5–7 vybráno</div>' +
+      '<div class="word-add-row">' +
+        '<input class="word-add-input" id="custom-word" type="text" placeholder="Vlastní slovo..." maxlength="30" onkeydown="if(event.key===\'Enter\')addWord()" />' +
+        '<button class="word-add-btn" onclick="addWord()">+ Přidat</button>' +
+      '</div>' +
+      '<button class="fb-btn" id="bn4" ' + (cnt < 5 ? 'disabled' : '') + ' onclick="next()">Další</button>' +
+      '</div>';
+  }
+
+  else if (s === 'praise') {
+    app.innerHTML = '<div class="fb-screen active">' +
+      gif('praise') +
+      '<div class="praise-title">Jde ti to skvěle!</div>' +
+      '<p class="fb-sub">Díky, že tomu dáváš svůj čas!</p>' +
+      '<button class="fb-btn" onclick="next()">Pokračovat</button>' +
+      '</div>';
+  }
+
+  else if (s === 'q5') {
+    app.innerHTML = '<div class="fb-screen active">' +
+      gif('q5') +
+      '<div class="fb-qlabel">What?!</div>' +
+      '<h2 class="fb-h2">Co tě na Danovi nejvíc překvapilo?</h2>' +
+      '<p class="fb-sub">V dobrém nebo ve zlém...</p>' +
+      '<textarea class="fb-textarea" id="ta5" placeholder="Třeba: Nečekal jsem, že tak rychle pochopí kontext...">' + (answers.q5||'') + '</textarea>' +
+      '<span class="skip-lnk" onclick="answers.q5=\'\'; next()">Přeskočit otázku</span>' +
+      '<button class="fb-btn" onclick="answers.q5=document.getElementById(\'ta5\').value; next()">Další</button>' +
+      '</div>';
+  }
+
+  else if (s === 'q6') {
+    app.innerHTML = '<div class="fb-screen active">' +
+      gif('q6') +
+      '<div class="fb-qlabel">Chybí něco?</div>' +
+      '<h2 class="fb-h2">Co by měl Dan začít dělat (víc)?</h2>' +
+      '<textarea class="fb-textarea" id="ta6" placeholder="Třeba: Víc se ozývat, když se zasekne...">' + (answers.q6||'') + '</textarea>' +
+      '<span class="skip-lnk" onclick="answers.q6=\'\'; next()">Přeskočit otázku</span>' +
+      '<button class="fb-btn" onclick="answers.q6=document.getElementById(\'ta6\').value; next()">Další</button>' +
+      '</div>';
+  }
+
+  else if (s === 'q7') {
+    app.innerHTML = '<div class="fb-screen active">' +
+      gif('q7') +
+      '<div class="fb-qlabel">Stop this!</div>' +
+      '<h2 class="fb-h2">Co by měl Dan přestat dělat?</h2>' +
+      '<textarea class="fb-textarea" id="ta7" placeholder="Třeba: Zbytečně se omlouvat za každý dotaz...">' + (answers.q7||'') + '</textarea>' +
+      '<span class="skip-lnk" onclick="answers.q7=\'\'; next()">Přeskočit otázku</span>' +
+      '<button class="fb-btn" onclick="answers.q7=document.getElementById(\'ta7\').value; next()">Další</button>' +
+      '</div>';
+  }
+
+  else if (s === 'q8') {
+    app.innerHTML = '<div class="fb-screen active">' +
+      gif('q8') +
+      '<div class="fb-qlabel">Continue...</div>' +
+      '<h2 class="fb-h2">Co rozhodně nesmí přestat dělat?</h2>' +
+      '<textarea class="fb-textarea" id="ta8" placeholder="Třeba: Vždy doručí to, co slíbí...">' + (answers.q8||'') + '</textarea>' +
+      '<span class="skip-lnk" onclick="answers.q8=\'\'; next()">Přeskočit otázku</span>' +
+      '<button class="fb-btn" onclick="answers.q8=document.getElementById(\'ta8\').value; next()">Další</button>' +
+      '</div>';
+  }
+
+  else if (s === 'q9') {
+    app.innerHTML = '<div class="fb-screen active">' +
+      gif('q9') +
+      '<div class="fb-qlabel">Poslední otázka!</div>' +
+      '<h2 class="fb-h2">Kdybys Danovi mohl "odemknout" jeden skill nebo návyk — co by to bylo?</h2>' +
+      '<textarea class="fb-textarea" id="ta9" placeholder="Třeba: Sebevědomí při prezentaci nápadů...">' + (answers.q9||'') + '</textarea>' +
+      '<span class="skip-lnk" onclick="answers.q9=\'\'; next()">Přeskočit otázku</span>' +
+      '<button class="fb-btn" onclick="answers.q9=document.getElementById(\'ta9\').value; next()">Hotovo!</button>' +
+      '</div>';
+  }
+
+  else if (s === 'done') {
+    var cipher = encode();
+    app.innerHTML = '<div class="fb-screen active">' +
+      gif('done') +
+      '<h2 class="fb-h2">Jsi borec. Díky! 🙌</h2>' +
+      '<p class="fb-sub">Zkopíruj tuhle šifrovanou zprávu a pošli ji Danovi přes Teams.</p>' +
+      '<div class="cipher-box" id="cbox">' + cipher + '</div>' +
+      '<button class="fb-btn" onclick="doCopy()" style="margin-bottom:12px;">Zkopírovat</button>' +
+      '<p style="font-size:12px;color:var(--text-muted);text-align:center;max-width:360px;">A pak můžeš zavřít toto okno. Dík!</p>' +
+      '</div>';
+  }
+}
+
+function pickNPS(n) {
+  answers.q1 = n;
+  document.querySelectorAll('.nps-btn').forEach(function(b) {
+    b.classList.toggle('sel', +b.textContent === n);
+  });
+  var btn = document.getElementById('bn1');
+  if (btn) btn.disabled = false;
+}
+
+function updExp(v) {
+  answers.q3 = v;
+  var fill = document.getElementById('efill');
+  var val = document.getElementById('eval');
+  var emo = document.getElementById('eemoji');
+  if (!fill) return;
+  var col = expColor(v);
+  fill.style.width = Math.round(v / 1.5) + '%';
+  fill.style.background = col;
+  val.style.color = col;
+  val.textContent = v + ' %';
+  if (v < 50) emo.innerHTML = '😬';
+  else if (v < 80) emo.innerHTML = '😐';
+  else if (v < 100) emo.innerHTML = '🙂';
+  else if (v === 100) emo.innerHTML = '✅';
+  else emo.innerHTML = '<span class="spark">⭐</span><span class="spark spark2">✨</span><span class="spark spark3">🌟</span>';
+}
+
+function toggleWord(w, el) {
+  if (!answers.q4) answers.q4 = [];
+  if (el.classList.contains('sel')) {
+    answers.q4 = answers.q4.filter(function(x) { return x !== w; });
+    el.classList.remove('sel');
+  } else if (answers.q4.length < 7) {
+    answers.q4.push(w);
+    el.classList.add('sel');
+  }
+  var cnt = answers.q4.length;
+  var wcnt = document.getElementById('wcnt');
+  if (wcnt) wcnt.textContent = cnt + ' / 5–7 vybráno';
+  var btn = document.getElementById('bn4');
+  if (btn) btn.disabled = cnt < 5;
+  document.querySelectorAll('.word-chip:not(.sel)').forEach(function(c) {
+    c.classList.toggle('dimmed', cnt >= 7);
+  });
+}
+
+function addWord() {
+  var input = document.getElementById('custom-word');
+  if (!input) return;
+  var w = input.value.trim();
+  if (!w || BASE_WORDS.concat(customWords).includes(w)) { input.value = ''; return; }
+  customWords.push(w);
+  input.value = '';
+  if (!answers.q4) answers.q4 = [];
+  var cnt = answers.q4.length;
+  if (cnt < 7) answers.q4.push(w);
+  var grid = document.getElementById('wgrid');
+  if (grid) {
+    var chip = document.createElement('div');
+    var isSel = answers.q4.includes(w);
+    chip.className = 'word-chip' + (isSel ? ' sel' : '') + (cnt >= 7 && !isSel ? ' dimmed' : '');
+    chip.textContent = w;
+    chip.onclick = function() { toggleWord(w, chip); };
+    grid.appendChild(chip);
+  }
+  var newCnt = answers.q4.length;
+  var wcnt = document.getElementById('wcnt');
+  if (wcnt) wcnt.textContent = newCnt + ' / 5–7 vybráno';
+  var btn = document.getElementById('bn4');
+  if (btn) btn.disabled = newCnt < 5;
+}
+
+function encode() {
+  var data = JSON.stringify({
+    nps: answers.q1, exp: answers.q3,
+    words: answers.q4, surprise: answers.q5||'',
+    start: answers.q6||'', stop: answers.q7||'',
+    keep: answers.q8||'', unlock: answers.q9||'',
+    ts: Date.now()
+  });
+  var KEY = 'DanFeedback2024';
+  var out = '';
+  for (var i = 0; i < data.length; i++) {
+    out += String.fromCharCode(data.charCodeAt(i) ^ KEY.charCodeAt(i % KEY.length));
+  }
+  return btoa(unescape(encodeURIComponent(out)));
+}
+
+function doCopy() {
+  var text = document.getElementById('cbox').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    var btn = document.querySelector('.fb-btn');
+    btn.textContent = 'Zkopírováno!';
+    setTimeout(function() { btn.textContent = 'Zkopírovat'; }, 2000);
+  });
+}
+
+render();
+</script>
